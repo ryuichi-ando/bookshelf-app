@@ -66,4 +66,41 @@ class ReviewTest extends TestCase
 
         $this->assertEquals($comment, $review->comment);
     }
+
+    /**
+     * レビューに対するいいねの中間レコードを取得できること
+     */
+    public function test_review_has_many_likes(): void
+    {
+        $user = User::factory()->create();
+        $review = Review::factory()->create();
+
+        // いいねの中間レコードを作成
+        \Illuminate\Support\Facades\DB::table('review_likes')->insert([
+            'review_id' => $review->id,
+            'user_id' => $user->id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // リレーション経由で取得できることを確認
+        $this->assertCount(1, $review->likes);
+        $this->assertEquals($user->id, $review->likes->first()->user_id);
+    }
+
+    /**
+     * レビューにいいねしたユーザーを取得できること
+     */
+    public function test_review_belongs_to_many_liked_users(): void
+    {
+        $user = User::factory()->create();
+        $review = Review::factory()->create();
+
+        // いいねを登録
+        $review->likedByUsers()->attach($user->id);
+
+        // いいねしたユーザーを取得できることを確認
+        $this->assertCount(1, $review->likedByUsers);
+        $this->assertEquals($user->id, $review->likedByUsers->first()->id);
+    }
 }

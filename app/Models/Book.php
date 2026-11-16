@@ -35,6 +35,21 @@ class Book extends Model
         ];
     }
 
+    public function getPublishedDateAttribute(): ?\Illuminate\Support\Carbon
+    {
+        $date = $this->published_at;
+
+        if (empty($date)) {
+            return null;
+        }
+
+        if ($date instanceof \Illuminate\Support\Carbon) {
+            return $date;
+        }
+
+        return \Illuminate\Support\Carbon::parse($date);
+    }
+
     /**
      * 書籍を登録したユーザー
      */

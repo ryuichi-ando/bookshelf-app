@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Enums\ReadingPlanStatus;
 
 class ReadingPlan extends Model
 {
@@ -33,13 +34,40 @@ class ReadingPlan extends Model
     /**
      * 属性の型変換
      */
-    protected function casts(): array
+    // protected function casts(): array
+    // {
+    //     return [
+    //         'due_date' => 'date',
+    //         'status' => 'integer',
+    //         'completed_at' => 'datetime',
+    //     ];
+    // }
+
+    // protected function casts(): array
+    // {
+    //     return [
+    //         'due_date' => 'date',
+    //         'status' => ReadingPlanStatus::class,
+    //         'completed_at' => 'datetime',
+    //     ];
+    // }
+
+    /**
+     * 属性の型変換
+     */
+    protected $casts = [
+        'due_date' => 'date',
+        'status' => ReadingPlanStatus::class,
+        'completed_at' => 'datetime',
+    ];
+
+    public function getTargetDateAttribute()
     {
-        return [
-            'due_date' => 'date',
-            'status' => 'integer',
-            'completed_at' => 'datetime',
-        ];
+        if ($this->due_date === null) {
+            return null;
+        }
+
+        return \Illuminate\Support\Carbon::parse($this->due_date);
     }
 
     /**
